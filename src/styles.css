@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Meiryo", "Yu Gothic", "MS Gothic", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
