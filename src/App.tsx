@@ -4,29 +4,15 @@ import { message, open, save } from "@tauri-apps/plugin-dialog";
 
 import { useHeaderForm } from "./hooks/useHeaderForm";
 import type { HeaderSchema } from "./hooks/useHeaderForm";
-import { useCsvUpload } from "./hooks/useCsvUpload";
 import { HeaderForm } from "./components/HeaderForm";
-import { CsvUploader } from "./components/CsvUploader";
-import { PreviewTable } from "./components/PreviewTable";
-import { ValidationErrors } from "./components/ValidationErrors";
-import { GenerateButton } from "./components/GenerateButton";
+import { FbKindTabs } from "./components/FbKindTabs";
+import { FurikomiPanel } from "./components/FurikomiPanel";
+import { DepositWithdrawalPanel } from "./components/DepositWithdrawalPanel";
+import type { FbKind } from "./types/fbKind";
 
 function App() {
   const headerForm = useHeaderForm();
-  const csvUpload = useCsvUpload();
-
-  const [outputPath, setOutputPath] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generateError, setGenerateError] = useState<string | null>(null);
-
-  const csvErrors = csvUpload.readResult?.errors ?? [];
-  const canGenerate =
-    headerForm.formState.isValid &&
-    csvUpload.csvPath !== null &&
-    outputPath !== null &&
-    csvErrors.length === 0 &&
-    (csvUpload.readResult?.total_count ?? 0) > 0 &&
-    !isGenerating;
+  const [fbKind, setFbKind] = useState<FbKind>("furikomi");
 
   // ---- ヘッダ情報 出力 ----
   const handleExportHeader = async () => {
@@ -65,63 +51,6 @@ function App() {
     }
   };
 
-  // ---- CSV テンプレート出力 ----
-  const handleExportTemplate = async () => {
-    const path = await save({
-      title: "CSVテンプレートの保存先を選択",
-      filters: [{ name: "CSV", extensions: ["csv"] }],
-      defaultPath: "template_FB.csv",
-    });
-    if (!path) return;
-
-    try {
-      await invoke("export_csv_template", { outputPath: path });
-      await message("CSVテンプレートを出力しました", { title: "完了", kind: "info" });
-    } catch (err) {
-      await message(String(err), { title: "エラー", kind: "error" });
-    }
-  };
-
-  // ---- 出力先選択 ----
-  const handleSelectOutput = async () => {
-    const path = await save({
-      title: "保存先を選択",
-      filters: [{ name: "テキストファイル", extensions: ["txt"] }],
-      defaultPath: "FB.txt",
-    });
-    if (path) setOutputPath(path);
-  };
-
-  // ---- FB 生成 ----
-  const handleGenerate = headerForm.handleSubmit(async (data) => {
-    if (!csvUpload.csvPath || !outputPath) return;
-
-    setIsGenerating(true);
-    setGenerateError(null);
-
-    try {
-      await invoke("generate_fb", {
-        headerInfo: {
-          payment_date: data.payment_date,
-          bank_code: data.bank_code,
-          bank_name: data.bank_name,
-          branch_code: data.branch_code,
-          branch_name: data.branch_name,
-          deposit_type: parseInt(data.deposit_type, 10),
-          account_number: data.account_number,
-        },
-        csvPath: csvUpload.csvPath,
-        outputPath,
-      });
-
-      await message("FBデータの生成が完了しました", { title: "完了", kind: "info" });
-    } catch (err) {
-      setGenerateError(String(err));
-    } finally {
-      setIsGenerating(false);
-    }
-  });
-
   return (
     <div className="h-screen flex flex-col bg-gray-200 overflow-hidden">
       {/* アプリヘッダー */}
@@ -129,6 +58,9 @@ function App() {
         <h1 className="font-bold text-sm tracking-wide">FB入金データ生成ツール</h1>
         <span className="text-orange-100 text-xs">全銀協フォーマット準拠</span>
       </header>
+
+      {/* FB種別タブ */}
+      <FbKindTabs value={fbKind} onChange={setFbKind} />
 
       {/* メインエリア（2カラム） */}
       <div className="flex flex-1 overflow-hidden p-2.5 gap-2.5">
@@ -141,37 +73,12 @@ function App() {
           />
         </aside>
 
-        {/* 右パネル: CSV・プレビュー・生成 */}
-        <div className="flex-1 flex flex-col gap-2.5 overflow-hidden min-w-0">
-          {/* 上部固定: CSV選択 */}
-          <CsvUploader
-            csvPath={csvUpload.csvPath}
-            totalCount={csvUpload.readResult?.total_count ?? null}
-            isLoading={csvUpload.isLoading}
-            loadError={csvUpload.loadError}
-            onSelect={csvUpload.selectAndReadCsv}
-            onExportTemplate={handleExportTemplate}
-          />
-
-          {/* 中部伸縮: プレビュー（残りスペースをすべて使う） */}
-          <PreviewTable
-            rows={csvUpload.readResult?.preview ?? []}
-            totalCount={csvUpload.readResult?.total_count ?? 0}
-          />
-
-          {/* バリデーションエラー（あるときのみ表示） */}
-          {csvErrors.length > 0 && <ValidationErrors errors={csvErrors} />}
-
-          {/* 下部固定: 出力先 + 生成ボタン */}
-          <GenerateButton
-            outputPath={outputPath}
-            onSelectOutput={handleSelectOutput}
-            onGenerate={handleGenerate}
-            canGenerate={canGenerate}
-            isGenerating={isGenerating}
-            generateError={generateError}
-          />
-        </div>
+        {/* 右パネル: CSV・プレビュー・生成（FB種別ごとに出し分け） */}
+        {fbKind === "furikomi" ? (
+          <FurikomiPanel key="furikomi" headerForm={headerForm} />
+        ) : (
+          <DepositWithdrawalPanel key="deposit_withdrawal" headerForm={headerForm} />
+        )}
       </div>
     </div>
   );

@@ -51,6 +51,12 @@ pub fn to_wareki_yymmdd(date_str: &str) -> Result<String, AppError> {
     Ok(format!("{:02}{:02}{:02}", era_year, month, day))
 }
 
+/// "YYMMDD" 形式の文字列から日(DD)部分を取り出す
+pub fn day_part(yymmdd: &str) -> &str {
+    debug_assert_eq!(yymmdd.len(), 6, "yymmdd は6文字である必要があります");
+    &yymmdd[4..6]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -71,5 +77,11 @@ mod tests {
     fn test_invalid_format() {
         assert!(to_wareki_yymmdd("20260606").is_err());
         assert!(to_wareki_yymmdd("2026-06-06").is_err());
+    }
+
+    #[test]
+    fn test_day_part() {
+        assert_eq!(day_part("080606"), "06");
+        assert_eq!(day_part("310430"), "30");
     }
 }

@@ -68,7 +68,7 @@ pub fn read_csv(path: &str) -> Result<(Vec<CsvRecord>, Vec<CsvValidationError>),
 
         // 金額バリデーション
         let amount = match amount_str.parse::<u64>() {
-            Ok(v) if v >= 1 && v <= 999_999_999_999 => v,
+            Ok(v) if (1..=999_999_999_999).contains(&v) => v,
             Ok(0) => {
                 errors.push(CsvValidationError {
                     row: row_num,

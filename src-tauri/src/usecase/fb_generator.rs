@@ -2,6 +2,7 @@ use crate::domain::csv_record::CsvRecord;
 use crate::domain::fb_record::RecordBuilder;
 use crate::domain::header_info::{to_wareki_yymmdd, HeaderInfo};
 use crate::error::AppError;
+use crate::usecase::common;
 
 /// ヘッダー情報と入金明細から全銀協フォーマットの FB データを生成する
 ///
@@ -27,7 +28,7 @@ pub fn generate_fb_data(
 
     // エンドレコード時点での総件数（自身を含む）
     let total_records = fb_records.len() as u64 + 1;
-    fb_records.push(build_end_record(total_records)?);
+    fb_records.push(common::build_end_record(total_records)?);
 
     Ok(fb_records)
 }
@@ -142,23 +143,6 @@ fn build_trailer_record(transfer_count: u64, transfer_sum: u64) -> Result<Vec<u8
     Ok(b.build())
 }
 
-/// エンドレコード（200 バイト）を構築する
-///
-/// | 番号 | 項目名         | 属性   | 桁  |
-/// |------|----------------|--------|-----|
-/// | 1    | データ区分     | N(1)   | 1   |
-/// | 2    | 総レコード件数 | N(10)  | 10  |
-/// | 3    | 伝送口座数     | N(5)   | 5   |
-/// | 4    | ダミー         | C(184) | 184 |
-fn build_end_record(total_records: u64) -> Result<Vec<u8>, AppError> {
-    let mut b = RecordBuilder::new(200);
-    b.literal("9")
-        .numeric_u64(10, total_records)
-        .numeric_u64(5, 1) // 伝送口座数（ヘッダー件数）
-        .spaces(184);
-    Ok(b.build())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -248,7 +232,7 @@ mod tests {
 
         let fb_data = generate_fb_data(&header, &records).unwrap();
         let data = &fb_data[1]; // データレコード
-        // 金額(1) は 0
+                                // 金額(1) は 0
         assert_eq!(&data[19..29], b"0000000000");
         // 金額(2) は large_amount
         assert_eq!(&data[128..140], b"010000000001");

@@ -5,6 +5,8 @@ interface Props {
   loadError: string | null;
   onSelect: () => void;
   onExportTemplate: () => void;
+  title?: string;
+  columnsHint?: string;
 }
 
 export function CsvUploader({
@@ -14,11 +16,13 @@ export function CsvUploader({
   loadError,
   onSelect,
   onExportTemplate,
+  title = "入金明細 CSV",
+  columnsHint = "文字コード: Shift-JIS　列: 金額, 銀行名(カナ), 支店名(カナ), 摘要文字列, EDI",
 }: Props) {
   return (
     <div className="bg-white border border-gray-200 rounded shadow-sm">
       <div className="flex items-center justify-between px-3 py-2 bg-orange-50 border-b border-orange-200">
-        <span className="text-xs font-semibold text-gray-600">入金明細 CSV</span>
+        <span className="text-xs font-semibold text-gray-600">{title}</span>
         <button
           type="button"
           onClick={onExportTemplate}
@@ -52,9 +56,7 @@ export function CsvUploader({
           </p>
         )}
 
-        <p className="text-xs text-gray-400">
-          文字コード: Shift-JIS　列: 金額, 銀行名(カナ), 支店名(カナ), 摘要文字列, EDI
-        </p>
+        <p className="text-xs text-gray-400">{columnsHint}</p>
       </div>
     </div>
   );
