@@ -6,9 +6,11 @@ mod usecase;
 
 use commands::{
     generate::generate_fb,
+    generate_deposit_withdrawal::generate_fb_deposit_withdrawal,
     header::{export_header_info, import_header_info},
-    template::export_csv_template,
+    template::{export_csv_template, export_deposit_withdrawal_csv_template},
     validate::read_csv_records,
+    validate_deposit_withdrawal::read_deposit_withdrawal_csv_records,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -18,8 +20,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             generate_fb,
+            generate_fb_deposit_withdrawal,
             read_csv_records,
+            read_deposit_withdrawal_csv_records,
             export_csv_template,
+            export_deposit_withdrawal_csv_template,
             export_header_info,
             import_header_info
         ])

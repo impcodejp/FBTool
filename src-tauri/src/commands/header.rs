@@ -16,8 +16,7 @@ pub struct HeaderFormData {
 /// ヘッダ情報を JSON ファイルに出力する
 #[tauri::command]
 pub fn export_header_info(data: HeaderFormData, output_path: String) -> Result<(), String> {
-    let json = serde_json::to_string_pretty(&data)
-        .map_err(|e| format!("JSON変換エラー: {}", e))?;
+    let json = serde_json::to_string_pretty(&data).map_err(|e| format!("JSON変換エラー: {}", e))?;
 
     let mut file = std::fs::File::create(&output_path)
         .map_err(|e| format!("ファイルの作成に失敗しました: {}", e))?;
@@ -33,8 +32,8 @@ pub fn import_header_info(file_path: String) -> Result<HeaderFormData, String> {
     let content = std::fs::read_to_string(&file_path)
         .map_err(|e| format!("ファイルの読み込みに失敗しました: {}", e))?;
 
-    let data: HeaderFormData = serde_json::from_str(&content)
-        .map_err(|e| format!("ファイルの形式が不正です: {}", e))?;
+    let data: HeaderFormData =
+        serde_json::from_str(&content).map_err(|e| format!("ファイルの形式が不正です: {}", e))?;
 
     Ok(data)
 }

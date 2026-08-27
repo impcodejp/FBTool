@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>FB入金データ生成ツール ユーザーマニュアル</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --orange:#f97316;
+    --orange-dark:#ea580c;
+    --orange-light:#fff7ed;
+    --orange-border:#fed7aa;
+    --gray-900:#1f2937;
+    --gray-700:#374151;
+    --gray-500:#6b7280;
+    --gray-300:#d1d5db;
+    --gray-100:#f3f4f6;
+    --red:#dc2626;
+    --red-light:#fef2f2;
+    --red-border:#fecaca;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI","Yu Gothic UI","Meiryo",sans-serif;
+    color:var(--gray-900);
+    background:#f5f5f4;
+    line-height:1.7;
+  }
+  main{
+    max-width:820px;
+    margin:0 auto;
+    padding:0 32px 60px;
+  }
+  header.hero{
+    background:linear-gradient(135deg,var(--orange) 0%, var(--orange-dark) 100%);
+    color:#fff;
+    margin:0 -32px 28px;
+    padding:32px 32px 24px;
+  }
+  header.hero h1{margin:0 0 6px;font-size:22px;font-weight:700;}
+  header.hero p{margin:0;font-size:13px;color:#ffedd5;}
+
+  nav.toc{
+    background:#fff;
+    border:1px solid var(--gray-300);
+    border-radius:8px;
+    padding:14px 20px;
+    margin-bottom:28px;
+    font-size:13.5px;
+  }
+  nav.toc ol{margin:6px 0 0;padding-left:20px;}
+  nav.toc a{color:var(--gray-700);text-decoration:none;}
+  nav.toc a:hover{color:var(--orange-dark);text-decoration:underline;}
+
+  section{margin-bottom:36px;}
+  h2{
+    font-size:18px;
+    color:var(--orange-dark);
+    border-bottom:2px solid var(--orange-border);
+    padding-bottom:6px;
+    margin:0 0 14px;
+    scroll-margin-top:16px;
+  }
+  h3{font-size:14.5px;color:var(--gray-900);margin:18px 0 8px;}
+  p{margin:8px 0;font-size:14px;color:var(--gray-700);}
+  ul,ol{font-size:14px;color:var(--gray-700);padding-left:22px;}
+  li{margin:4px 0;}
+  code{
+    background:var(--gray-100);
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:12.5px;
+    font-family:Consolas,"Courier New",monospace;
+    color:#b45309;
+  }
+  pre{
+    background:#1e1e1e;
+    color:#e5e5e5;
+    padding:12px 14px;
+    border-radius:8px;
+    font-size:12.5px;
+    overflow-x:auto;
+    font-family:Consolas,"Courier New",monospace;
+    line-height:1.6;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    margin:10px 0 4px;
+    background:#fff;
+  }
+  th,td{border:1px solid var(--gray-300);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:var(--orange-light);color:var(--orange-dark);font-weight:600;white-space:nowrap;}
+  .table-wrap{overflow-x:auto;}
+
+  .note{
+    background:#eff6ff;border:1px solid #bfdbfe;border-left:4px solid #3b82f6;
+    border-radius:6px;padding:10px 14px;font-size:13px;margin:12px 0;color:#1e3a8a;
+  }
+  .warn{
+    background:var(--red-light);border:1px solid var(--red-border);border-left:4px solid var(--red);
+    border-radius:6px;padding:10px 14px;font-size:13px;margin:12px 0;color:#991b1b;
+  }
+
+  .step-list{list-style:none;padding:0;margin:14px 0;counter-reset:step;}
+  .step-list>li{
+    counter-increment:step;position:relative;padding:10px 16px 10px 46px;margin-bottom:8px;
+    background:#fff;border:1px solid var(--gray-300);border-radius:8px;
+  }
+  .step-list>li::before{
+    content:counter(step);position:absolute;left:12px;top:10px;width:22px;height:22px;
+    border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step-list>li strong{display:block;font-size:14px;color:var(--gray-900);margin-bottom:2px;}
+  .step-list>li span.desc{font-size:13px;color:var(--gray-500);}
+
+  footer{
+    text-align:center;font-size:12px;color:var(--gray-500);
+    padding:20px 0 8px;border-top:1px solid var(--gray-300);margin-top:32px;
+  }
+  @media print{ body{background:#fff;} }
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <h1>FB入金データ生成ツール　ユーザーマニュアル</h1>
+    <p>入金明細CSVから全銀協フォーマットのFBデータファイルを作成するツールです（振込入金明細・入出金明細の2種類に対応）</p>
+  </header>
+
+  <nav class="toc">
+    目次
+    <ol>
+      <li><a href="#overview">このツールでできること</a></li>
+      <li><a href="#launch">起動方法</a></li>
+      <li><a href="#fb-kind">FB種別の選び方</a></li>
+      <li><a href="#flow">使い方の流れ</a></li>
+      <li><a href="#csv-format">CSVファイルの作り方（振込入金明細）</a></li>
+      <li><a href="#csv-format-dw">CSVファイルの作り方（入出金明細）</a></li>
+      <li><a href="#errors">エラーが出たときの対処法</a></li>
+      <li><a href="#faq">よくある質問</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. 概要 -->
+  <section id="overview">
+    <h2>このツールでできること</h2>
+    <p>
+      入金日や口座番号などの情報と、明細を記載したCSVファイルを入力すると、
+      銀行に渡すためのFBデータファイル（テキストファイル）を自動で作成します。
+      「振込入金明細」「入出金明細」の2種類のFBフォーマットに対応しており、画面上部のタブで切り替えます。
+    </p>
+    <ul>
+      <li>ヘッダー情報（入金日・銀行コード・口座番号など）を画面で入力（両種別で共通）</li>
+      <li>明細CSVファイルを読み込んで内容をプレビュー</li>
+      <li>入力ミスがあれば画面上でエラーを表示</li>
+      <li>「FBデータを生成」ボタン1つでファイルを出力</li>
+    </ul>
+  </section>
+
+  <!-- 2. 起動方法 -->
+  <section id="launch">
+    <h2>起動方法</h2>
+    <p>配布された <code>.exe</code> ファイルをダブルクリックすると起動します。インストールは不要です。</p>
+  </section>
+
+  <!-- 3. FB種別の選び方 -->
+  <section id="fb-kind">
+    <h2>FB種別の選び方</h2>
+    <p>
+      画面上部に「振込入金明細」「入出金明細」の2つのタブがあります。作成したいFBデータの種類に合わせてタブを選択してください。
+    </p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>タブ</th><th>用途</th></tr>
+        <tr><td>振込入金明細</td><td>振込による入金明細のFBデータを作成する場合</td></tr>
+        <tr><td>入出金明細</td><td>入金・出金が混在する入出金明細のFBデータを作成する場合</td></tr>
+      </table>
+    </div>
+    <div class="note">
+      タブを切り替えると、選択していたCSVファイルや出力先はリセットされますが、左側のヘッダー情報の入力内容はそのまま引き継がれます。
+    </div>
+  </section>
+
+  <!-- 4. 使い方の流れ -->
+  <section id="flow">
+    <h2>使い方の流れ</h2>
+    <ol class="step-list">
+      <li><strong>①FB種別のタブを選ぶ</strong><span class="desc">画面上部のタブから「振込入金明細」または「入出金明細」を選択します。</span></li>
+      <li><strong>②ヘッダー情報を入力する</strong><span class="desc">画面左側に、入金日・銀行コード・銀行名・支店コード・支店名・預金種目・口座番号を入力します。</span></li>
+      <li><strong>③明細CSVファイルを選択する</strong><span class="desc">「ファイルを選択」ボタンから、選択中のタブに対応した形式のCSVファイルを読み込みます。読み込むと内容がプレビュー表示されます。</span></li>
+      <li><strong>④内容を確認する</strong><span class="desc">プレビューの件数や内容を確認します。入力ミスがある場合は赤枠でエラーが表示されるので、CSVファイルを修正してもう一度読み込みます。</span></li>
+      <li><strong>⑤出力先を選択する</strong><span class="desc">「保存先を選択」ボタンから、FBデータファイルを保存する場所とファイル名を指定します。</span></li>
+      <li><strong>⑥「FBデータを生成」ボタンを押す</strong><span class="desc">「FBデータの生成が完了しました」と表示されれば完了です。指定した場所にファイルが作成されています。</span></li>
+    </ol>
+    <div class="note">
+      すべての項目が正しく入力されるまで「FBデータを生成」ボタンは押せません。ボタンが押せない場合は、入力項目・CSVの読込・出力先の選択に不足がないか確認してください。
+    </div>
+
+    <h3>ヘッダー情報を毎回入力するのが面倒な場合</h3>
+    <p>
+      画面左上の「出力」で入力内容をファイルに保存できます。次回以降は「取込」で同じファイルを読み込むと、入力を省略できます。
+    </p>
+
+    <h3>CSVファイルのひな形が欲しい場合</h3>
+    <p>
+      各タブの「CSVテンプレートを出力」ボタンから、選択中のFB種別に対応した形式のCSVファイルをダウンロードできます。これを開いて内容を書き換えると簡単に作成できます。
+    </p>
+  </section>
+
+  <!-- 4. CSVフォーマット（振込入金明細） -->
+  <section id="csv-format">
+    <h2>CSVファイルの作り方（振込入金明細）</h2>
+    <p>「振込入金明細」タブで読み込むCSVファイルは、次の5つの列で作成してください（1行目は見出し行）。</p>
+    <pre>金額,銀行名(カナ),支店名(カナ),摘要文字列,EDI
+100000,ﾄｳｷﾖｳｷﾞﾝｺｳ,ｼﾝｼﾞﾕｸｼﾃﾝ,ｶﾌﾞｼｷｶﾞｲｼｾﾃﾃﾞﾉﾏｾ,
+200000,ﾐｽﾞﾎｷﾞﾝｺｳ,ｼﾌﾞﾔｼﾃﾝ,ｶﾌﾞｼｷｶﾞｲｼｾﾃﾃｶﾚﾒ,EDI12345</pre>
+    <div class="table-wrap">
+      <table>
+        <tr><th>列名</th><th>必須</th><th>入力できる内容</th></tr>
+        <tr><td>金額</td><td>必須</td><td>1以上の数字（12桁まで）</td></tr>
+        <tr><td>銀行名(カナ)</td><td>空欄可</td><td>半角カタカナ・半角英数字、15文字以内</td></tr>
+        <tr><td>支店名(カナ)</td><td>空欄可</td><td>半角カタカナ・半角英数字、15文字以内</td></tr>
+        <tr><td>摘要文字列</td><td>必須</td><td>半角カタカナ・半角英数字、48文字以内</td></tr>
+        <tr><td>EDI</td><td>空欄可</td><td>20文字以内</td></tr>
+      </table>
+    </div>
+    <div class="warn">
+      <strong>ポイント：</strong>全角文字（アイウエオ、１２３など）は使用できません。すべて半角に変換してから入力してください。Excelで作る場合は「CSV UTF-8」ではなく通常の「CSV（コンマ区切り）」形式で保存してください。
+    </div>
+  </section>
+
+  <!-- 4-2. CSVフォーマット（入出金明細） -->
+  <section id="csv-format-dw">
+    <h2>CSVファイルの作り方（入出金明細）</h2>
+    <p>「入出金明細」タブで読み込むCSVファイルは、次の8つの列で作成してください（1行目は見出し行）。</p>
+    <pre>入払区分,取引区分,取引金額,摘要文字列,仕向銀行名(カナ),仕向店名(カナ),摘要内容,EDI
+1,11,100000,ｶﾌﾞｼｷｶﾞｲｼｬｻﾝﾌﾟﾙ,ﾄｳｷﾖｳｷﾞﾝｺｳ,ｼﾝｼﾞｭｸｼﾃﾝ,ﾆｭｳｷﾝ,
+2,10,50000,ｹｲﾋｼｼｭﾂ,,,ｼｭｯｷﾝ,EDI12345</pre>
+    <div class="table-wrap">
+      <table>
+        <tr><th>列名</th><th>必須</th><th>入力できる内容</th></tr>
+        <tr><td>入払区分</td><td>必須</td><td><code>1</code>（入金）または<code>2</code>（出金）</td></tr>
+        <tr><td>取引区分</td><td>必須</td><td><code>10</code>現金・<code>11</code>振込・<code>12</code>他店券入金・<code>13</code>交換・<code>14</code>振替・<code>18</code>その他・<code>19</code>訂正 のいずれか</td></tr>
+        <tr><td>取引金額</td><td>必須</td><td>1以上の数字（12桁まで）</td></tr>
+        <tr><td>摘要文字列</td><td>必須</td><td>半角カタカナ・半角英数字、48文字以内</td></tr>
+        <tr><td>仕向銀行名(カナ)</td><td>空欄可</td><td>半角カタカナ・半角英数字、15文字以内</td></tr>
+        <tr><td>仕向店名(カナ)</td><td>空欄可</td><td>半角カタカナ・半角英数字、15文字以内</td></tr>
+        <tr><td>摘要内容</td><td>空欄可</td><td>20文字以内</td></tr>
+        <tr><td>EDI</td><td>空欄可</td><td>20文字以内</td></tr>
+      </table>
+    </div>
+    <div class="warn">
+      <strong>ポイント：</strong>全角文字は使用できません。すべて半角に変換してから入力してください。入払区分・取引区分は指定の数字コード以外を入力するとエラーになります。
+    </div>
+    <div class="note">
+      他店券金額・交換呈示日・不渡返還日・手形小切手情報・僚店番号など、上記に含まれない項目はデモ用にすべてゼロで出力されます。CSVで入力する必要はありません。
+    </div>
+  </section>
+
+  <!-- 5. エラー対処 -->
+  <section id="errors">
+    <h2>エラーが出たときの対処法</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>表示内容</th><th>対処法</th></tr>
+        <tr><td>入力欄が赤くなり、メッセージが出る</td><td>入金日・銀行コードなど、ヘッダー情報の形式を見直してください（桁数、半角、日付の形式など）。</td></tr>
+        <tr><td>「CSVバリデーションエラー」欄に行番号付きでエラーが出る</td><td>表示された行番号の内容をCSVファイル側で修正し、「ファイルを選択」でもう一度読み込み直してください。</td></tr>
+        <tr><td>「FBデータを生成」ボタンが押せない</td><td>ヘッダー情報の入力漏れ・CSVの未選択やエラー・出力先の未選択のいずれかが原因です。画面上から順に確認してください。</td></tr>
+        <tr><td>生成時にエラーメッセージが表示される</td><td>表示された内容に従い、CSVファイルの内容や保存先フォルダの状態（開いていないか、権限があるか）を確認してください。</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6. FAQ -->
+  <section id="faq">
+    <h2>よくある質問</h2>
+    <h3>Q. CSVを読み込むと文字が崩れる／エラーになる</h3>
+    <p>A. Excelの保存形式が原因の可能性があります。「CSV UTF-8」ではなく「CSV（コンマ区切り）」形式で保存し直してください。</p>
+
+    <h3>Q. 入力したヘッダー情報は次回も残っているか</h3>
+    <p>A. 残りません。毎回入力するか、「出力」機能で保存したファイルを「取込」機能で読み込んでください。</p>
+
+    <h3>Q. 全角カタカナで入力したい</h3>
+    <p>A. 本ツールは半角カタカナのみ対応しています。全角（アイウエオ）は半角（ｱｲｳｴｵ）に変換して入力してください。</p>
+
+    <h3>Q. タブを切り替えたらCSVの選択がリセットされた</h3>
+    <p>A. 仕様です。「振込入金明細」と「入出金明細」はCSVフォーマットが異なるため、タブを切り替えるとCSVファイルの選択・出力先の指定はリセットされます。ヘッダー情報の入力内容はリセットされません。</p>
+
+    <h3>Q. 入出金明細で入金と出金を同じCSVに混在させてよいか</h3>
+    <p>A. 問題ありません。1つのCSVファイルの中で「入払区分」列を行ごとに<code>1</code>（入金）・<code>2</code>（出金）と使い分けることで、混在した明細を作成できます。</p>
+  </section>
+
+  <footer>FB入金データ生成ツール　ユーザーマニュアル　／　社内利用限定　／　制作: impcode</footer>
+</main>
+</body>
+</html>
