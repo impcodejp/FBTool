@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\ryosuke_takiguchi\\\\Documents\\\\mysys\\\\tauri\\\\FBTool\" -Recurse -Directory)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Format-Table FullName)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\ryosuke_takiguchi\\\\Documents\\\\mysys\\\\tauri\\\\FBTool\\\\src\" -Recurse | Where-Object {!$_.PSIsContainer} | Select-Object FullName)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\ryosuke_takiguchi\\\\Documents\\\\mysys\\\\tauri\\\\FBTool\\\\src-tauri\\\\src\" -Recurse | Where-Object {!$_.PSIsContainer} | Select-Object FullName)",
+      "PowerShell(git *)",
+      "PowerShell(gh auth *)"
+    ]
+  },
+  "language": "japanese"
+}
